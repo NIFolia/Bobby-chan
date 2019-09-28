@@ -2,45 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player_Movement : MonoBehaviour
+public class Move : MonoBehaviour
 {
 
-
-    CharacterController characterController;
-
-    public float speed = 6.0f;
-    public float jumpSpeed = 8.0f;
-    public float gravity = 20.0f;
-
-    private Vector2 moveDirection = Vector2.zero;
+    public LayerMask whatIsGround;
+    public Transform groundCheck;
+    public bool isGrounded;
+    public float jumpForce;
+    public float speed;
+    Rigidbody2D rb;
 
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if (characterController.isGrounded)
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            // We are grounded, so recalculate
-            // move direction directly from axes
-
-            moveDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            moveDirection *= speed;
-
-            if (Input.GetButton("Jump"))
-            {
-                moveDirection.y = jumpSpeed;
-            }
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            isGrounded = false;
         }
+    }
 
-        // Apply gravity. Gravity is multiplied by deltaTime twice (once here, and once below
-        // when the moveDirection is multiplied by deltaTime). This is because gravity should be applied
-        // as an acceleration (ms^-2)
-        moveDirection.y -= gravity * Time.deltaTime;
-
-        // Move the controller
-        characterController.Move(moveDirection * Time.deltaTime);
+    void FixedUpdate()
+    {
+        isGrounded = Physics2D.OverlapPoint(groundCheck.position, whatIsGround);
+        float x = Input.GetAxis("Horizontal");
+        Vector3 move = new Vector3(x * speed, rb.velocity.y, 0f);
+        rb.velocity = move;
     }
 }

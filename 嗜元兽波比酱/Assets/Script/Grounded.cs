@@ -26,6 +26,8 @@ public class Grounded : MonoBehaviour
         ground = collision.collider.tag;
         if (collision.collider.tag == "Untagged") {
             Player.GetComponent<Player_movement>().isGrounded = true;
+            Player.GetComponent<Player_movement>().isSecJumped = false;
+            Player.GetComponent<Player_movement>().jump_count = 0f;
         }
     }
 
